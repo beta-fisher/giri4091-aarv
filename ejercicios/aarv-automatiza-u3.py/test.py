@@ -73,20 +73,31 @@ def AddProduct():
         print(response.text)
 
 def UpdateProduct():    
-    noProduct = (input("\n"+"Ingrese el número de producto a cambiar: "+"\n")) 
-    url = "https://fakestoreapi.com/products/"+noProduct
+    noProduct = input("\nIngrese el número de producto a cambiar: ") 
+    url = "https://fakestoreapi.com/products/" + noProduct
 
-    url = "https://fakestoreapi.com/products"
-    titleProduct = (input("Ingresa el título del producto: "+"\n"))
-    priceProduct = (input("Ingresa el precio del producto: "+"\n"))
-    descriptionProduct = (input("Ingresa la descripción del producto: "+"\n"))
-    categoryProduct = (input("Ingresa la categoría del producto: "+"\n"))
+    # Obtener y validar los nuevos valores del producto
+    titleProduct = input("Ingresa el título del producto: ").strip()
+    priceProduct = input("Ingresa el precio del producto: ").strip()
+    descriptionProduct = input("Ingresa la descripción del producto: ").strip()
+    categoryProduct = input("Ingresa la categoría del producto: ").strip()
+
+    # Verificar si los campos son válidos
+    if not titleProduct or not priceProduct or not descriptionProduct or not categoryProduct:
+        print("\nError: Todos los campos son obligatorios y no pueden estar vacíos.")
+        return
+
+    try:
+        priceProduct = float(priceProduct)  # Convertir el precio a un número
+    except ValueError:
+        print("\nError: El precio debe ser un número válido.")
+        return
 
     payload = {
-        "title":" "+titleProduct,
-        "price":" "+priceProduct,
-        "description":" "+descriptionProduct,
-        "category":" "+categoryProduct,
+        "title": titleProduct,
+        "price": priceProduct,
+        "description": descriptionProduct,
+        "category": categoryProduct,
         "image": "https://fakestoreapi.com/img/placeholder.jpg",
         "rating": {
             "rate": 4.5,
@@ -98,16 +109,17 @@ def UpdateProduct():
         "Content-Type": "application/json"
     }
 
-    response = requests.put(url, json=payload, headers=headers)
-
-    if response.status_code == 200:
-        print("Producto actualizado exitosamente.")
-        print(response.json())
-    else:
-        print("Error al actualizar el producto.")
-        print(response.status_code)
-        print(response.text)
-        print("Modificar producto")
+    try:
+        response = requests.put(url, json=payload, headers=headers)
+        if response.status_code == 200:
+            print("Producto actualizado exitosamente.")
+            print(json.dumps(response.json(), indent=4, ensure_ascii=False))
+        else:
+            print("Error al actualizar el producto.")
+            print("Código de estado:", response.status_code)
+            print("Mensaje:", response.text)
+    except requests.exceptions.RequestException as e:
+        print("\nSe produjo un error en la solicitud: ", e)
     
 def DeleteProduct():
     noProduct = input("Ingresa el valor del número del producto: ") 
@@ -138,7 +150,7 @@ while True:
     elif opcion == '3':
         AddProduct()
     elif opcion == '4':
-        AddProduct()
+        UpdateProduct()
     elif opcion == '5':
         DeleteProduct()
     elif opcion == '6':
