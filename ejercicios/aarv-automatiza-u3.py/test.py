@@ -18,22 +18,22 @@ def GetAllProducts():
     print(json_formateado)
     
 def GetProduct():
-    noProduct = (input("Ingresa el valor del número del producto: ")) 
-    url = "https://fakestoreapi.com/products/"+noProduct
-    print(url)
+    noProduct = input("Ingresa el valor del número del producto: ") 
+    url = "https://fakestoreapi.com/products/" + noProduct
 
-    response = requests.get(url)
-    json_formateado = json.dumps(response.json(), indent=4, ensure_ascii=False) 
-    print("\n"+"Listado de productos"+"\n")
-    print(json_formateado)
-    
-    if response.status_code == 200:
-        print("\n"+"Producto consultado exitosamente :D")
-        print(response.json())
-    else:
-        print("\n"+"Error al consultar el producto ;(")
-        print(response.status_code)
-        print(response.text)
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            json_formateado = json.dumps(response.json(), indent=4, ensure_ascii=False)
+            print("\nListado de productos\n")
+            print(json_formateado)
+            print("\nProducto consultado exitosamente :D")
+        else:
+            print("\nError al consultar el producto ;(")
+            print("Código de estado:", response.status_code)
+            print("Mensaje:", response.text)
+    except requests.exceptions.RequestException as e:
+        print("\nSe produjo un error en la solicitud: ", e)
     
 def AddProduct():
     
@@ -110,19 +110,24 @@ def UpdateProduct():
         print("Modificar producto")
     
 def DeleteProduct():
-    noProduct = (input("Ingresa el valor del número del producto: ")) 
-    url = "https://fakestoreapi.com/products/"+noProduct
+    noProduct = input("Ingresa el valor del número del producto: ") 
+    url = "https://fakestoreapi.com/products/" + noProduct
 
-    response = requests.delete(url)
-
-    if response.status_code == 200:
-        print("Producto eliminado exitosamente :D")
-        print(response.json())
-    else:
-        print("Error al eliminar el producto ;(())")
-        print(response.status_code)
-        print(response.text)
-
+    try:
+        response = requests.delete(url)
+        if response.status_code == 200:
+            if response.json():  # Verifica si la respuesta tiene contenido
+                print("Producto eliminado exitosamente :D")
+                print(response.json())
+            else:
+                print("El producto no existe o ya fue eliminado.")
+        else:
+            print("Error al eliminar el producto ;(")
+            print("Código de estado:", response.status_code)
+            print("Mensaje:", response.text)
+    except requests.exceptions.RequestException as e:
+        print("\nSe produjo un error en la solicitud: ", e)
+        
 while True:
     
     opcion = input("Selecciona una opción (1-5): ")
